@@ -6,20 +6,26 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import java.util.Locale
 
-class ConversorMoeda : AppCompatActivity() {
+class ConversorMoedaActivity : AppCompatActivity() {
 
-    companion object{
-        private const val cotacao = 5.50;
+    companion object {
+        private const val COTACAO_DOLAR = 5.50
     }
 
-    private val localeBR = Locale("pt", "BR")
 
-    private var realParaDolar = true;
+    // val: nunca muda depois de criado
+    private val localeBR: Locale = Locale.forLanguageTag("pt-BR")
 
-    // lateinit var: só serão inicializadas no setupViews(), depois do setContentView()
+    // var: muda durante a execução (true = R$ -> US$ | false = US$ -> R$)
+    private var realParaDolar = true
+
+    // lateinit var: só recebem valor no setupViews(), depois do setContentView()
     private lateinit var ivBandeiraOrigem: ImageView
     private lateinit var ivBandeiraDestino: ImageView
     private lateinit var btnInverter: Button
@@ -28,25 +34,36 @@ class ConversorMoeda : AppCompatActivity() {
     private lateinit var btnLimpar: Button
     private lateinit var tvResultado: TextView
 
-    // ---------- CICLO DE VIDA ----------
+    // life cycle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        enableEdgeToEdge()
+        setContentView(R.layout.conversor_moeda)
+
+        // Afasta o conteúdo da barra de status, da barra de navegação e do teclado
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val barras = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+            )
+            v.setPadding(barras.left, barras.top, barras.right, barras.bottom)
+            insets
+        }
 
         setupViews()
         setupListeners()
     }
 
-    // ---------- CONFIGURAÇÃO ----------
+    //config
 
     // Liga cada atributo ao componente do XML
     private fun setupViews() {
-        ivBandeiraOrigem = findViewById(R.id.idBandeiraOrigem)
-        ivBandeiraDestino = findViewById(R.id.idBandeiraDestino)
-        btnInverter = findViewById(R.id.bntInverter)
+        ivBandeiraOrigem = findViewById(R.id.ivBandeiraOrigem)
+        ivBandeiraDestino = findViewById(R.id.ivBandeiraDestino)
+        btnInverter = findViewById(R.id.btnInverter)
         etValor = findViewById(R.id.etValor)
-        btnCalcular = findViewById(R.id.bntCalvular)
+        btnCalcular = findViewById(R.id.btnCalcular)
+        btnLimpar = findViewById(R.id.btnLimpar)
         tvResultado = findViewById(R.id.tvResultado)
     }
 
@@ -65,9 +82,8 @@ class ConversorMoeda : AppCompatActivity() {
         }
     }
 
-    // ---------- FUNÇÕES UTILITÁRIAS ----------
+    // funções
 
-    // Valida o campo, converte e mostra o resultado
     private fun calcular() {
         val texto = etValor.text.toString().trim()
 
@@ -84,42 +100,41 @@ class ConversorMoeda : AppCompatActivity() {
             return
         }
 
-        val resultado = converterMoeda(valor)
-        val simbolo = if (realParaDolar) "US$" else "R$"
-
-        tvResultado.text = String.format(localeBR, "%s %.2f", simbolo, resultado)
+        exibirResultado(converterMoeda(valor))
     }
 
-    // Faz a conta de acordo com o sentido atual da conversão
+
+    private fun exibirResultado(valor: Double) {
+        val simbolo = if (realParaDolar) "US$" else "R$"
+        tvResultado.text = String.format(localeBR, "Resultado: %s %.2f", simbolo, valor)
+    }
+
+
     private fun converterMoeda(valor: Double): Double {
         return if (realParaDolar) {
-            valor / cotacao   // R$ -> US$
+            valor / COTACAO_DOLAR   // R$ -> US$
         } else {
-            valor * cotacao   // US$ -> R$
+            valor * COTACAO_DOLAR   // US$ -> R$
         }
     }
 
-    // Troca o sentido da conversão e as bandeiras de lado
     private fun inverterMoedas() {
         realParaDolar = !realParaDolar
 
         if (realParaDolar) {
             ivBandeiraOrigem.setImageResource(R.drawable.bandeira_br)
             ivBandeiraDestino.setImageResource(R.drawable.bandeira_eua)
-            etValor.hint = "Valor em R$"
         } else {
             ivBandeiraOrigem.setImageResource(R.drawable.bandeira_eua)
             ivBandeiraDestino.setImageResource(R.drawable.bandeira_br)
-            etValor.hint = "Valor em US$"
         }
 
-        // O resultado antigo não vale mais para o novo sentido
-        tvResultado.text = "Resultado"
+        exibirResultado(0.0)
     }
 
     private fun limparCampos() {
         etValor.text.clear()
-        tvResultado.text = "Resultado"
+        exibirResultado(0.0)
         etValor.requestFocus()
     }
 }

@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cambio">
         <activity
-            android:name=".ConversorMoeda"
+            android:name=".ConversorMoedaActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
