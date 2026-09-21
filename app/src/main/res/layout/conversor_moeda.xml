@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:gravity="center"
-            android:text="Conversor\nReal ↔ Dólar"
+            android:text="Conversor\nde Moedas"
             android:textSize="36sp"
             android:textStyle="bold" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="0dp"
-                android:text="converter"
+                android:text="⇄"
                 android:textSize="18sp" />
 
             <ImageView
@@ -61,12 +61,35 @@
                 android:src="@drawable/bandeira_eua" />
         </LinearLayout>
 
+        <!-- Escolha da moeda estrangeira -->
+        <RadioGroup
+            android:id="@+id/rgMoeda"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbDolar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Dólar (US$)" />
+
+            <RadioButton
+                android:id="@+id/rbEuro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Euro (€)" />
+        </RadioGroup>
+
         <!-- textColor fixo: o fundo é branco, então o texto precisa ser escuro (senão some no modo noturno) -->
         <EditText
             android:id="@+id/etValor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/borda_campo"
             android:hint="Digite o valor"
             android:importantForAutofill="no"
